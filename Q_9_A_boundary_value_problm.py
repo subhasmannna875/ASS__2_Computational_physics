@@ -13,12 +13,17 @@ def bc(ya, yb):
 # Initial guess for the solution
 x = np.linspace(1, 2, 100)
 y_guess = np.zeros((2, x.size))
+x_valus=x.copy()
+def exact(x):
+    return np.log(x)
+y_exat=exact(x_valus)
 
 # Solve the boundary value problem
 sol = solve_bvp(ode, bc, x, y_guess)
 
 # Plot the solution
-plt.plot(sol.x, sol.y[0], label='y(x)')
+plt.plot(sol.x, sol.y[0], label='numarical solution',linestyle="--")
+plt.plot(x_valus,y_exat,label='analytical solution')
 '''
 plt.plot(sol.x,sol.y[1],label="y' ")
 '''
