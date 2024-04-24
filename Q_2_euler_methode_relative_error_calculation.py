@@ -1,60 +1,69 @@
-import math
+import numpy as np
 import matplotlib.pyplot as plt
 
-def f(t, y):
-    return y / t - y**2
+def euler(f,t0,y0,tf,h):
+    result=[(t0,y0)]
+    t=t0
+    y=y0
+    n=int((tf-t0)/h)
+    for i in range(1,n+1):
+        y+=h*f(y,t)
+        t+=h
+        result.append((t,y))
+    return result
 
-def analytical_solution(t):
-    return t / (1 + math.log(t))
+def f(y,t):
+    return (y/t)-(y/t)**2
+t0=1
+tf=2
+y0=1
+h=0.1
 
-def euler_method(f, t0, y0, h, t_target):
-    t_values = [t0]
-    y_values = [y0]
-    while t_values[-1] < t_target:
-        t_new = t_values[-1] + h
-        y_new = y_values[-1] + h * f(t_values[-1], y_values[-1])
-        t_values.append(t_new)
-        y_values.append(y_new)
-    return t_values, y_values
+solution=euler(f,t0,y0,tf,h)
 
-t0 = 1
-y0 = 1
-h = 0.1
-t_target = 2
+y_values=[t[1] for t in solution]
+t_values=[t[0] for t in solution]
 
-# Using Euler's method to approximate the solution
-t_values, y_values = euler_method(f, t0, y0, h, t_target)
+plt.plot(t_values,y_values,label="solution by euler method")
 
-# Analytical solution
-analytical_y_values = [analytical_solution(t) for t in t_values]
+def original_soln(t):
+    return t/(1+np.log(t))
 
-# Computing absolute and relative errors
-absolute_errors = [abs(analytical_y - approx_y) for analytical_y, approx_y in zip(analytical_y_values, y_values)]
-relative_errors = [abs((analytical_y - approx_y) / analytical_y) for analytical_y, approx_y in zip(analytical_y_values, y_values)]
+orig_soln=original_soln(t_values)
 
-print("Absolute Errors:", absolute_errors)
-print("Relative Errors:", relative_errors)
+absolute_error=np.abs(y_values-orig_soln)
+relative_error=np.abs((y_values-orig_soln)/y_values)
 
-# Plotting the results
-plt.plot(t_values, y_values, label="Approximated Solution using euler methode")
-plt.plot(t_values, analytical_y_values, label="Analytical Solution")
-plt.plot(t_values,absolute_errors,label=" absolute error  ")
-plt.plot(t_values,relative_errors,label="Relative erro")
-plt.xlabel("t")
-plt.ylabel("y")
-plt.title("Approximated vs Analytical Solution using Euler's Method")
-plt.legend()
+tt=np.linspace(1,2,1000)
+plt.plot(tt,original_soln(tt),label="Original solution")
 plt.grid()
+plt.xlabel("t")
+plt.ylabel("y(t)")
+plt.legend()
+
+
+print("t\t\t euler soln\t\t original soln \t\t abs error\t\t relative error ")
+for t, euler_soln,orig_soln,abs_error,rel_error in zip(t_values,y_values,orig_soln,absolute_error,relative_error):
+    print(f"{t:.1f}\t\t {euler_soln:.6f}\t\t{orig_soln:.6f}\t\t {abs_error:.6f}\t\t {rel_error:.6f}")
+
+
 plt.show()
 
-
 '''
+out put
+t                euler soln              original soln           abs error               relative error 
+1.0              1.000000               1.000000                 0.000000                0.000000
+1.1              1.000000               1.004282                 0.004282                0.004282
+1.2              1.008264               1.014952                 0.006688                0.006633
+1.3              1.021689               1.029814                 0.008124                0.007952
+1.4              1.038515               1.047534                 0.009019                0.008685
+1.5              1.057668               1.067262                 0.009594                0.009071
+1.6              1.078461               1.088433                 0.009972                0.009246
+1.7              1.100432               1.110655                 0.010223                0.009290
+1.8              1.123262               1.133654                 0.010392                0.009251
+1.9              1.146724               1.157228                 0.010505                0.009161
+2.0              1.170652               1.181232                 0.010581                0.009038
 
- out put 
-Absolute Errors: [0.0, 0.004281727936202406, 0.02404322312465057, 0.054518923117764295, 0.09233646714443078, 0.13507672988887065,
-0.18099835818044185, 0.2288497839352629, 0.27773544349671275, 0.327018895183804, 0.376252229270284]
-Relative Errors: [0.0, 0.004263472905159145, 0.02368901749590106, 0.052940569447012475, 0.08814651769015609, 0.1265637538507726,
- 0.16629265213298067, 0.2060493791416394, 0.24499146308597577, 0.2825880231101745, 0.3185252005841877]
 
 
 '''
