@@ -12,6 +12,11 @@ def bc(ya, yb):
 
 # Define the range of x values where we want to solve the ODE
 x = np.linspace(np.pi/4, np.pi/3, 100)
+x_valus=x.copy()
+# Exact solution  that is given in the book 
+def exact(x):
+    return (np.sin(x))**0.5
+y_exat=exact(x_valus)
 
 # Initial guess for the solution
 y_guess = np.zeros((2, x.size))
@@ -20,7 +25,9 @@ y_guess = np.zeros((2, x.size))
 sol = solve_bvp(ode, bc, x, y_guess)
 
 # Plot the solution
-plt.plot(sol.x, sol.y[0], label='y(x)')
+plt.plot(sol.x, sol.y[0], label='numarical solution',linestyle="--")
+plt.plot(x_valus,y_exat,label="exact analytical solution ")
+
 plt.xlabel('x')
 plt.ylabel('y')
 plt.title("Solution of y'' = -(2(y')^3 + y^2*y')*sec(x)")
